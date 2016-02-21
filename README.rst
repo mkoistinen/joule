@@ -82,6 +82,12 @@ on the active energy tariff.
 
 .. image:: images/hourly.jpg
 
+Note that I'm displaying each hour by Weekends, Summer and Winter. This is
+because my energy tariff is different depending on if the current day is a
+weekend (or recognized holiday), or is during Piedmont's defined Winter or
+Summer period. All three are shown, because some months contain records for
+all three tariffs.
+
 
 Notes
 =====
