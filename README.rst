@@ -46,8 +46,8 @@ captures the signal broadcast every 10 seconds by the Efergy transmitter. It
 then converts this to the instantaneous power demand, and pushes it into
 Django via a management command.
 
-Django logs this data into a MySQL database, and converts it (on demand) into
-per minute averages.
+Django (1.8) logs this data into a MySQL database, and converts it (on demand)
+into per minute averages.
 
 The software here in this repo then takes over and serves up a webpage that
 illustrates the power-demand in a couple of useful ways:
