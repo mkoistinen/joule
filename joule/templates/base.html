@@ -1,0 +1,40 @@
+{% load sekizai_tags %}
+<!doctype html>
+<html>
+    <head>
+        <title>{% block title %}This is my new project home page{% endblock title %}</title>
+        <style type="text/css">
+            .nav {
+                padding-left: 0;
+            }
+            .nav li {
+                display: inline;
+                list-style-type: none;
+                padding-right: 20px;
+            }
+            .container {
+                width: 100%;
+                margin: 0 auto;
+            }
+            .content {
+                float: left;
+                width: 80%;
+            }
+            .sidebar {
+                float: left;
+                width: 20%;
+            }
+        </style>
+        <script src="https://use.typekit.net/qft1aqd.js"></script>
+        <script>try{Typekit.load({ async: true });}catch(e){}</script>
+        {% render_block "css" %}
+    </head>
+    <body>
+        <div class="container">
+            <ul class="nav">
+            </ul>
+            {% block content %}{% endblock content %}
+        </div>
+        {% render_block "js" %}
+    </body>
+</html>

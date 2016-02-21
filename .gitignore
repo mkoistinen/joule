@@ -1,0 +1,13 @@
+*.egg
+*.pyc
+*.pyo
+.coverage
+.idea
+.tox
+build
+dist
+settings_local.py
+*.sh
+# By default ALL scripts to be omitted, if the project requires one,
+# explicitly add it beneath here.
+!coverage.sh

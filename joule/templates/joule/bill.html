@@ -1,0 +1,285 @@
+{% extends "fullwidth.html" %}
+{% load joule_tags sekizai_tags %}
+
+{% block content %}
+    {% addtoblock "css" %}
+    <style>
+        body {
+            font-family: "myriad-pro-semi-condensed","Helvetica Neue","Helvetica","Arial",sans-serif;
+        }
+        h1 {
+            position: relative;
+            text-align: center;
+            font-size: 72px;
+            font-weight: 200;
+            margin-bottom: 0;
+        }
+        h1 a {
+            font-weight: 100;
+            position: absolute;
+            top: 0;
+            color: #999;
+            text-decoration: none;
+        }
+        h1 a.prev {
+            left: 20px;
+        }
+        h1 a.next {
+            right: 20px;
+        }
+        h1 a:hover {
+            color: #000;
+        }
+        h2 {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 400;
+        }
+        .profiles-wrapper, .temps-wrapper {
+            padding: 20px;
+        }
+        .profiles, .temps {
+            border-collapse: collapse;
+            border-spacing: 0px;
+            width: 100%;
+            min-width: 850px;
+        }
+        .temps tfoot th,
+        .temps tbody td {
+            text-align: center;
+            font-family: "moby-monospace", monospace;
+            font-size: 12px;
+            letter-spacing: -0.1em;
+        }
+        .temps tbody {
+            border-bottom: 1px solid #000;
+        }
+        .temps tbody .temperatures {
+{#            background: linear-gradient(to top, hsl(240, 100%, 40%) 0%, hsl(0, 0%, 100%) 26.67%, hsl(180, 100%, 40%) 33.3%, hsl(60, 100%, 40%) 50%, hsl(0, 100%, 40%) 100%);#}
+        }
+        .temps tbody tr td {
+            height: 150px;
+            position: relative;
+        }
+        .temps tbody td .high,
+        .temps tbody td .low {
+            color: rgba(0,0,0,0.67);
+            display: inline-block;
+            font-size: 12px;
+            left: 10%;
+            line-height: 1.5em;
+            position: absolute;
+            right: 10%;
+            text-align: center;
+        }
+        .temps tbody td .low {
+            background: linear-gradient(to bottom, hsl(207, 100%, 50%) 2px, transparent 2px);
+            padding-top: 2px;
+            bottom: 0;
+        }
+        .temps tbody td .high {
+            border-bottom: 2px solid #a00;
+            height: 1.5em;
+        }
+        .temps tbody .data.energy .kwhrs {
+            display: block;
+            position: absolute;
+            bottom: 0;
+            line-height: 1.5em;
+            width: 80%;
+            background: hsl(207, 80%, 85%);
+            left: 10%;
+            border-top-right-radius: 25px;
+            border-top-left-radius: 25px;
+            padding-top: 5px;
+            overflow: hidden;
+        }
+        .profiles thead th {
+            font-size: 12px;
+            font-weight: 200;
+            border-bottom: 1px solid #000;
+        }
+        .profiles thead tr.head th {
+            font-size: 28px;
+        }
+        .profiles thead tr.subhead th {
+            font-size: 18px;
+            font-weight: 400;
+        }
+        .profiles tbody .hour,
+        .profiles tbody .kwhrs,
+        .profiles tbody .cost,
+        .profiles tbody .ext_cost {
+            color: rgba(0, 0, 0, 0.1);
+            font-family: "moby-monospace", monospace;
+            font-size: 13px;
+            letter-spacing: -0.1em;
+            padding: 0;
+        }
+        .profiles .kwhrs,
+        .profiles tbody .kwhrs .data {
+            padding-left: 0.5em;
+            text-align: left;
+        }
+        .profiles .cost,
+        .profiles .ext_cost,
+        .profiles tbody .cost .data,
+        .profiles tbody .ext_cost .data {
+            padding-right: 1em;
+            text-align: right;
+        }
+        .profiles tfoot {
+            font-size: 13px;
+            font-family: "moby-monospace", monospace;
+            letter-spacing: -0.1em;
+        }
+        .profiles tbody .kwhrs {
+            border-left: 1px solid rgba(0,0,0,0.667);
+        }
+        .profiles tbody tr:hover {
+            background-color: #f4f4f4;
+        }
+        .profiles tbody tr:hover th,
+        .profiles tbody tr:hover td {
+            color: rgba(0,0,0,0.75);
+            font-weight: bold;
+        }
+        .profiles tbody .data {
+            display: block;
+            margin: 0.25px 0;
+        }
+        .profiles tbody .peak {  /* do not remove this */
+            background: hsla(4, 80%, 70%, 0.1);
+        }
+        .profiles .hour {
+            width: 60px;
+        }
+        .profiles tfoot th {
+            border-top: 1px solid #000;
+        }
+        .leading-zero {  /* do not remove this. */
+            visibility: hidden;
+        }
+        .projected {
+            margin: 40px 0;
+            text-align: center;
+        }
+        .projected div {
+            background-color: #333;
+            border-radius: 0.5em;
+            color: #fff;
+            display: inline-block;
+            font-weight: 400;
+            margin: 5px;
+            padding: 0.5em;
+            text-align: center;
+            width: 200px;
+        }
+        .projected div .value {
+            font-size: 24px;
+            font-family: "moby-monospace", monospace;
+            letter-spacing: -0.1em;
+        }
+        .projected div label {
+            display: block;
+            font-size: 16px;
+        }
+        sup {
+            font-size: 0.6em;
+        }
+        .footnotes {
+            font-size: 14px;
+            padding: 0 0 0 20px;
+        }
+        .meta {
+            color: #ccc;
+            font-family: "moby-monospace", monospace;
+            font-size: 11px;
+        }
+        .meta a {
+            color: #ccc;
+        }
+        .dow {
+            color: #ccc;
+            font-size: 0.8em;
+        }
+    </style>
+    {% endaddtoblock %}
+    <h1>{% if prev_month %}<a class="prev" href="{% url "bill_view" prev_month.year prev_month.month %}">&lt;</a>{% endif %}{{ active_month.0|date:"F Y" }}{% if next_month %}<a class="next" href="{% url "bill_view" next_month.year next_month.month %}">&gt;</a>{% endif %}</h1>
+    {% if current_month %}<h2>As of {{ now|date:"j F Y H:i:m" }}</h2>{% else %}<h2>Final</h2>{%  endif %}
+    <div class="projected">
+        <div class="kwhrs"><label>Est. Usage (kWHrs)</label><span class="value">{{ est_kwhrs|float_format:"3,3" }}</span></div>
+        <div class="cost"><label>Est. Energy Cost</label><span class="value">${{ est_energy_cost|float_format:"3,2" }}</span></div>
+        <div class="bill"><label>Est. Monthly Bill</label><span class="value">${{ est_bill|float_format:"3,2" }}</span></div>
+    </div>
+    <div class="temps-wrapper">
+        <table class="temps">
+            <tbody>
+                <tr class="data temperatures">
+                    {% for day in temperatures %}
+                        <td class="bar">{% if day.low > 0.0 %}
+                            <span class="low" style="height: {{ day.low_pct|floatformat:2 }}%;">{{ day.low|floatformat:0 }}</span>{% endif %}{% if day.high > 0.0 %}
+                            <span class="high" style="bottom: {{ day.high_pct|floatformat:2 }}%;">{{ day.high|floatformat:0 }}</span>{% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                <tr class="data energy">{% for day in temperatures %}<td{% if today|date:"Ymd" == day.date|date:"Ymd" %} class="today"{% endif %}><span title="{{ day.kwhrs|floatformat:2 }} kWHrs" class="kwhrs" style="height: {{ day.kwhrs_pct }}%;">{{ day.kwhrs|floatformat:0 }}</span></td>{% endfor %}</tr>
+            </tbody>
+            <tfoot>
+                <tr class="date">{% for day in temperatures %}<th>{{ day.date|date:"d" }}<br><span class="dow">{{ day.date|date:"D" }}</span></th>{% endfor %}</tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="profiles-wrapper">
+        <table class="profiles">
+            <thead>
+                <tr class="head">
+                    <th class="hour"></th>
+                    <th colspan="3">Weekends<sup>1</sup></th>
+                    <th colspan="3">Summer</th>
+                    <th colspan="3">Winter</th>
+                </tr>
+                <tr class="subhead">
+                    <th class="hour">Hour</th>
+                    <th class="kwhrs">kWHrs</th><th class="cost">Cost</th><th class="ext_cost">x{{ num_days.weekend }}d</th>
+                    <th class="kwhrs">kWHrs</th><th class="cost">Cost</th><th class="ext_cost">x{{ num_days.summer }}d</th>
+                    <th class="kwhrs">kWHrs</th><th class="cost">Cost</th><th class="ext_cost">x{{ num_days.winter }}d</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hour in hours %}
+                <tr>
+                    <th class="hour">{{ hour }}h</th>
+                    {% get weekend_hours hour as weekend %}
+                    <td class="kwhrs"><span class="data" style="background: linear-gradient(to left, hsla(207,80%,75%,0.5) 0%, hsla(207,80%,75%,0.5) {{ weekend.pct_kwhrs }}%, transparent {{ weekend.pct_kwhrs }}%);">{{ weekend.kwhrs|float_format:"3,3" }}</span></td>
+                    <td class="cost"><span class="data" style="background: linear-gradient(to right, hsla(4,80%,75%,0.5) 0%, hsla(4,80%,75%,0.5) {{ weekend.pct_cost }}%, transparent {{ weekend.pct_cost }}%);">${{ weekend.cost|float_format:"1,3" }}</span></td>
+                    <td class="ext_cost"><span class="data">${{ weekend.ext_cost|float_format:"2,2" }}</span></td>
+                    {% get summer_hours hour as summer %}
+                    <td class="kwhrs{% if forloop.counter0 >= 13 and forloop.counter0 < 18 %} peak{% endif %}"><span class="data" style="background: linear-gradient(to left, hsla(207,80%,75%,0.5) 0%, hsla(207,80%,75%,0.5) {{ summer.pct_kwhrs }}%, transparent {{ summer.pct_kwhrs }}%);">{{ summer.kwhrs|float_format:"3,3" }}</span></td>
+                    <td class="cost{% if forloop.counter0 >= 13 and forloop.counter0 < 18 %} peak{% endif %}"><span class="data" style="background: linear-gradient(to right, hsla(4,80%,75%,0.5) 0%, hsla(4,80%,75%,0.5) {{ summer.pct_cost }}%, transparent {{ summer.pct_cost }}%);">${{ summer.cost|float_format:"1,3" }}</span></td>
+                    <td class="ext_cost{% if forloop.counter0 >= 13 and forloop.counter0 < 18 %} peak{% endif %}"><span class="data">${{ summer.ext_cost|float_format:"2,2" }}</span></td>
+                    {% get winter_hours hour as winter %}
+                    <td class="kwhrs{% if forloop.counter0 >= 6 and forloop.counter0 < 10 %} peak{% endif %}"><span class="data" style="background: linear-gradient(to left, hsla(207,80%,75%,0.5) 0%, hsla(207,80%,75%,0.5) {{ winter.pct_kwhrs }}%, transparent {{ winter.pct_kwhrs }}%);">{{ winter.kwhrs|float_format:"3,3" }}</span></td>
+                    <td class="cost{% if forloop.counter0 >= 6 and forloop.counter0 < 10 %} peak{% endif %}"><span class="data" style="background: linear-gradient(to right, hsla(4,80%,75%,0.5) 0%, hsla(4,80%,75%,0.5) {{ winter.pct_cost }}%, transparent {{ winter.pct_cost }}%);">${{ winter.cost|float_format:"1,3" }}</span></td>
+                    <td class="ext_cost{% if forloop.counter0 >= 6 and forloop.counter0 < 10 %} peak{% endif %}"><span class="data">${{ winter.ext_cost|float_format:"2,2" }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th class="hour"></th>
+                    <th class="kwhrs">{{ kwhrs_per_weekend|float_format:"3,3" }}</th><th class="cost">${{ cost_per_weekend|float_format:"1,3" }}</th><th class="ext_cost">${{ ext_cost_per_weekend|float_format:"2,2" }}</th>
+                    <th class="kwhrs">{{ kwhrs_per_summer|float_format:"3,3" }}</th><th class="cost">${{ cost_per_summer|float_format:"1,3" }}</th><th class="ext_cost">${{ ext_cost_per_summer|float_format:"2,2" }}</th>
+                    <th class="kwhrs">{{ kwhrs_per_winter|float_format:"3,3" }}</th><th class="cost">${{ cost_per_winter|float_format:"1,3" }}</th><th class="ext_cost">${{ ext_cost_per_winter|float_format:"2,2" }}</th>
+                </tr>
+            </tfoot>
+        </table>
+        <ol class="footnotes">
+            <li>Piedmont designates the following as applicable holidays: New Years Day, Memorial Day, Independence Day, Labor Day, Thanksgiving Day, and Christmas Day.</li>
+        </ol>
+        {% if stats %}
+            <p class="meta">Data coverage (h/d/w/m): {{ stats.0|floatformat:2 }}% / {{ stats.1|floatformat:2 }}% / {{ stats.2|floatformat:2 }}% / {{ stats.3|floatformat:2 }}%</p>
+        {% endif %}
+        <p class="meta">{{ timer }}</p>
+    </div>
+{% endblock %}
